@@ -1,0 +1,112 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+    function isOwner(uid) {
+      return isSignedIn() && request.auth.uid == uid;
+    }
+    function isAdmin() {
+      return isSignedIn() &&
+        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true;
+    }
+    function isParticipant(users) {
+      return isSignedIn() && request.auth.uid in users;
+    }
+
+    // ---- users ----
+    match /users/{uid} {
+      allow read: if isSignedIn();
+      allow create: if isOwner(uid);
+      // Users can update their own doc but never grant themselves admin or unban themselves.
+      allow update: if isOwner(uid) &&
+        request.resource.data.isAdmin == resource.data.isAdmin &&
+        request.resource.data.isBanned == resource.data.isBanned
+        || isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // ---- profiles ----
+    match /profiles/{uid} {
+      allow read: if isSignedIn();
+      allow create, update: if isOwner(uid) || isAdmin();
+      allow delete: if isOwner(uid) || isAdmin();
+    }
+
+    // ---- subscriptions ----
+    // Only server (Admin SDK, via the M-Pesa callback route) writes subscription status.
+    match /subscriptions/{uid} {
+      allow read: if isOwner(uid) || isAdmin();
+      allow write: if false;
+    }
+
+    // ---- payments ----
+    // Created/updated only by trusted server routes; users may read their own.
+    match /payments/{paymentId} {
+      allow read: if isSignedIn() && (resource.data.uid == request.auth.uid || isAdmin());
+      allow write: if false;
+    }
+
+    // ---- matches ----
+    match /matches/{matchId} {
+      allow read: if isParticipant(resource.data.users) || isAdmin();
+      allow create: if isSignedIn() && request.auth.uid in request.resource.data.users;
+      allow update: if isParticipant(resource.data.users);
+      allow delete: if isAdmin();
+
+      match /messages/{messageId} {
+        allow read: if isParticipant(get(/databases/$(database)/documents/matches/$(matchId)).data.users);
+        allow create: if isSignedIn() &&
+          request.auth.uid == request.resource.data.senderId &&
+          isParticipant(get(/databases/$(database)/documents/matches/$(matchId)).data.users);
+        allow update: if isParticipant(get(/databases/$(database)/documents/matches/$(matchId)).data.users);
+      }
+
+      match /typing/{uid} {
+        allow read: if isParticipant(get(/databases/$(database)/documents/matches/$(matchId)).data.users);
+        allow write: if isOwner(uid);
+      }
+    }
+
+    // ---- video calls ----
+    match /videoCalls/{sessionId} {
+      allow read: if isParticipant(resource.data.participants) || isAdmin();
+      allow create: if isSignedIn() && request.auth.uid in request.resource.data.participants;
+      allow update: if isParticipant(resource.data.participants);
+      allow delete: if isAdmin();
+    }
+
+    // ---- notifications ----
+    match /notifications/{notificationId} {
+      allow read, update: if isOwner(resource.data.uid) || isAdmin();
+      allow create: if isAdmin(); // written by server/admin routes, not directly by clients
+      allow delete: if isOwner(resource.data.uid) || isAdmin();
+    }
+
+    // ---- reports ----
+    match /reports/{reportId} {
+      allow create: if isSignedIn() && request.auth.uid == request.resource.data.reporterId;
+      allow read: if isAdmin() || (isSignedIn() && resource.data.reporterId == request.auth.uid);
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // ---- friend requests ----
+    match /friendRequests/{requestId} {
+      allow read: if isSignedIn() &&
+        (resource.data.fromUid == request.auth.uid || resource.data.toUid == request.auth.uid);
+      allow create: if isSignedIn() && request.auth.uid == request.resource.data.fromUid;
+      allow update: if isSignedIn() && resource.data.toUid == request.auth.uid;
+    }
+
+    // ---- app settings (admin-managed) ----
+    match /settings/{docId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+  }
+}
