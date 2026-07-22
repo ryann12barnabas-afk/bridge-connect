@@ -3,6 +3,7 @@ import Sidebar from '@/components/dashboard/Sidebar'
 import MobileNav from '@/components/dashboard/MobileNav'
 import Topbar from '@/components/dashboard/Topbar'
 import IncomingCallListener from '@/components/video/IncomingCallListener'
+import NotificationBridge from '@/components/dashboard/NotificationBridge'
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -15,6 +16,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </div>
         <MobileNav />
         <IncomingCallListener />
+        <NotificationBridge />
       </div>
     </RequireAuth>
   )
