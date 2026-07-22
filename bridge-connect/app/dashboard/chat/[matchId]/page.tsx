@@ -184,7 +184,14 @@ export default function ChatThreadPage() {
         </button>
       </div>
 
-      {activeCall && <VideoCallRoom roomUrl={activeCall.roomUrl} token={activeCall.token} onLeave={handleLeaveCall} />}
-    </div>
+{activeCall && (
+        <VideoCallRoom
+          roomUrl={activeCall.roomUrl}
+          token={activeCall.token}
+          onLeave={handleLeaveCall}
+          timeLimitSeconds={isPremium ? undefined : 180}
+          onTimeUp={handleFreeCallTimeUp}
+        />
+      )}    </div>
   )
 }
