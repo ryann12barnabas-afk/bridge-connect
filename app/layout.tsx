@@ -3,6 +3,7 @@ import { Sora, Inter } from 'next/font/google'
 import './globals.css'
 import { AuthProvider } from '@/hooks/useAuth'
 import { Toaster } from 'react-hot-toast'
+import Script from 'next/script'
 
 const sora = Sora({
   subsets: ['latin'],
@@ -66,6 +67,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           {children}
           <Toaster position="top-center" />
         </AuthProvider>
+        <Script src="https://cdn.jsdelivr.net/npm/eruda" strategy="afterInteractive" />
+        <Script id="eruda-init" strategy="afterInteractive">
+          {`eruda.init();`}
+        </Script>
       </body>
     </html>
   )
