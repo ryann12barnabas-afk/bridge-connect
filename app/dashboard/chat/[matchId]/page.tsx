@@ -97,20 +97,23 @@ export default function ChatThreadPage() {
   }
 
   const handleStartCall = async () => {
-    if (!isPremium) {
-      toast.error('Video calls are a Premium feature. Upgrade to start calling.')
-      router.push('/dashboard/subscription')
-      return
-    }
     if (!firebaseUser || !user || !otherUid || !matchId) return
     try {
       const idToken = await firebaseUser.getIdToken()
       const session = await startVideoCall(idToken, matchId, user.uid, otherUid)
       setActiveCall({ roomUrl: session.roomUrl, token: null, sessionId: session.id })
       await updateCallStatus(session.id, 'active')
+      if (!isPremium) {
+        toast('Free trial call — 3 minutes, then upgrade for unlimited calls.', { icon: '⏱️' })
+      }
     } catch (err: any) {
       toast.error(err?.message || 'Could not start the call.')
     }
+  }
+
+  const handleFreeCallTimeUp = () => {
+    toast.error("Your 3-minute free call has ended. Upgrade for unlimited video calls.")
+    router.push('/dashboard/subscription')
   }
 
   const handleLeaveCall = async () => {
@@ -181,7 +184,15 @@ export default function ChatThreadPage() {
         </button>
       </div>
 
-      {activeCall && <VideoCallRoom roomUrl={activeCall.roomUrl} token={activeCall.token} onLeave={handleLeaveCall} />}
+      {activeCall && (
+        <VideoCallRoom
+          roomUrl={activeCall.roomUrl}
+          token={activeCall.token}
+          onLeave={handleLeaveCall}
+          timeLimitSeconds={isPremium ? undefined : 180}
+          onTimeUp={handleFreeCallTimeUp}
+        />
+      )}
     </div>
   )
 }
