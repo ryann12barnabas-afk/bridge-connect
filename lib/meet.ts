@@ -88,17 +88,51 @@ export async function createMeetRequest(
     createdAt: now,
     compatibilityScore,
   } satisfies Omit<Match, 'id'>)
+
+  const fromUserSnap = await getDoc(doc(db, 'users', fromUid))
+  const fromName = fromUserSnap.exists() ? (fromUserSnap.data() as User).firstName : 'Someone'
+
+  await addDoc(collection(db, 'notifications'), {
+    uid: toUid,
+    type: 'new_match',
+    title: 'New meet request',
+    body: `${fromName} wants to connect with you!`,
+    isRead: false,
+    createdAt: now,
+    relatedId: docRef.id,
+  })
+
   return docRef.id
 }
-
 /** Records the responder's decision and, if both sides accepted, activates the match. */
 export async function respondToMeetRequest(matchId: string, accept: boolean) {
   const matchRef = doc(db, 'matches', matchId)
+  const now = new Date().toISOString()
   await updateDoc(matchRef, {
     status: accept ? 'accepted' : 'declined',
-    respondedAt: new Date().toISOString(),
+    respondedAt: now,
   })
-}
+
+  if (accept) {
+    const matchSnap = await getDoc(matchRef)
+    if (matchSnap.exists()) {
+      const match = matchSnap.data() as Match
+      const responderUid = match.users.find((u) => u !== match.initiatedBy)
+      const responderSnap = responderUid ? await getDoc(doc(db, 'users', responderUid)) : null
+      const responderName = responderSnap?.exists() ? (responderSnap.data() as User).firstName : 'Someone'
+
+      await addDoc(collection(db, 'notifications'), {
+        uid: match.initiatedBy,
+        type: 'new_match',
+        title: "It's a match!",
+        body: `${responderName} accepted your request. Start chatting now!`,
+        isRead: false,
+        createdAt: now,
+        relatedId: matchId,
+      })
+    }
+  }
+    }
 
 /** Decrements the free-meet counter for users without an active subscription. */
 export async function consumeFreeMeet(uid: string) {
