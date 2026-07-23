@@ -28,13 +28,9 @@ export default function Topbar() {
       </div>
 
       <div className="flex items-center gap-3">
-        {isPremium ? (
+        {isPremium && (
           <span className="inline-flex items-center gap-1 rounded-full bg-bridge-gradient px-3 py-1.5 text-xs font-semibold text-white">
             <HiOutlineSparkles /> Premium
-          </span>
-        ) : (
-          <span className="inline-flex items-center gap-1 rounded-full bg-brand-mist px-3 py-1.5 text-xs font-semibold text-brand-blue dark:bg-white/10">
-            {user?.freeMeetsRemaining ?? 0} free meets left
           </span>
         )}
         <Link href="/dashboard/profile" className="h-9 w-9 overflow-hidden rounded-full bg-bridge-gradient shrink-0" />
