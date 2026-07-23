@@ -1,12 +1,20 @@
 'use client'
 
 import Link from 'next/link'
-import { HiOutlineSparkles } from 'react-icons/hi2'
+import { useRouter } from 'next/navigation'
+import { HiOutlineSparkles, HiOutlineArrowRightOnRectangle } from 'react-icons/hi2'
 import { useAuth } from '@/hooks/useAuth'
 
 export default function Topbar() {
-  const { user, profile, subscription } = useAuth()
+  const { user, profile, subscription, signOut } = useAuth()
+  const router = useRouter()
   const isPremium = subscription?.status === 'active'
+
+  const handleSignOut = async () => {
+    await fetch('/api/auth/session', { method: 'DELETE' })
+    await signOut()
+    router.push('/')
+  }
 
   return (
     <header className="glass sticky top-0 z-30 flex items-center justify-between border-b border-black/5 px-4 py-3 dark:border-white/10 lg:px-8">
@@ -30,6 +38,13 @@ export default function Topbar() {
           </span>
         )}
         <Link href="/dashboard/profile" className="h-9 w-9 overflow-hidden rounded-full bg-bridge-gradient shrink-0" />
+        <button
+          onClick={handleSignOut}
+          className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-red-50 text-red-500 dark:bg-red-500/10"
+          aria-label="Sign out"
+        >
+          <HiOutlineArrowRightOnRectangle className="h-4 w-4" />
+        </button>
       </div>
     </header>
   )
