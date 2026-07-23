@@ -129,6 +129,8 @@ export async function loginWithGoogle() {
       profileCompletionPercent: 0,
       lastActiveAt: now,
       onlineStatus: true,
+      dailyLikesUsed: 0,
+      dailyLikesResetAt: '',
     },
     { merge: true }
   )
