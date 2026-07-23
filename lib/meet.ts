@@ -147,3 +147,52 @@ export async function hasMeetsAvailable(user: User, isPremium: boolean): Promise
   if (isPremium) return true
   return user.freeMeetsRemaining > 0
 }
+
+export async function findMeetCandidatesBatch(
+  currentUid: string,
+  prefs: MeetPreferences,
+  excludeUids: string[],
+  maxCount = 20
+): Promise<{ user: User; profile: Profile; compatibilityScore: number }[]> {
+  const profilesRef = collection(db, 'profiles')
+
+  const constraints = []
+  if (prefs.gender !== 'everyone') {
+    constraints.push(where('gender', '==', prefs.gender))
+  }
+  if (prefs.county) {
+    constraints.push(where('county', '==', prefs.county))
+  }
+
+  const q = query(profilesRef, ...constraints, limit(50))
+  const snap = await getDocs(q)
+
+  const candidates: { user: User; profile: Profile; compatibilityScore: number }[] = []
+
+  for (const docSnap of snap.docs) {
+    const profile = docSnap.data() as Profile
+    if (profile.uid === currentUid) continue
+    if (excludeUids.includes(profile.uid)) continue
+    if (profile.age < prefs.ageMin || profile.age > prefs.ageMax) continue
+    if (prefs.relationshipIntent && profile.relationshipIntent !== prefs.relationshipIntent) continue
+
+    const userSnap = await getDoc(doc(db, 'users', profile.uid))
+    if (!userSnap.exists()) continue
+    const user = userSnap.data() as User
+    if (user.isBanned) continue
+
+    const overlap = prefs.interests
+      ? profile.interests.filter((i) => prefs.interests!.includes(i)).length
+      : 0
+    const compatibilityScore = Math.min(100, 50 + overlap * 10)
+
+    candidates.push({ user, profile, compatibilityScore })
+  }
+
+  candidates.sort((a, b) => b.compatibilityScore - a.compatibilityScore)
+  return candidates.slice(0, maxCount)
+}
+
+
+
+
