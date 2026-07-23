@@ -5,14 +5,16 @@ import { usePathname, useRouter } from 'next/navigation'
 import {
   HiOutlineHome, HiOutlineUserCircle, HiOutlineSparkles, HiOutlineUsers,
   HiOutlineChatBubbleLeftRight, HiOutlineBell, HiOutlineCog6Tooth,
-  HiOutlineMapPin, HiOutlineStar, HiOutlineArrowRightOnRectangle,
+  HiOutlineMapPin, HiOutlineStar, HiOutlineArrowRightOnRectangle, HiOutlineHeart,
 } from 'react-icons/hi2'
 import Logo from '@/components/ui/Logo'
 import { useAuth } from '@/hooks/useAuth'
 
 const NAV = [
+  const NAV = [
   { href: '/dashboard', label: 'Overview', icon: HiOutlineHome },
   { href: '/dashboard/meet', label: 'Meet Someone', icon: HiOutlineSparkles },
+  { href: '/dashboard/likes', label: 'Who Liked You', icon: HiOutlineHeart },
   { href: '/dashboard/matches', label: 'Matches', icon: HiOutlineUsers },
   { href: '/dashboard/chat', label: 'Chats', icon: HiOutlineChatBubbleLeftRight },
   { href: '/dashboard/nearby', label: 'People Nearby', icon: HiOutlineMapPin },
