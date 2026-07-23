@@ -48,8 +48,7 @@ export async function registerUser(data: RegisterInput) {
     onlineStatus: true,
     dailyLikesUsed: 0,
     dailyLikesResetAt: '',
-    }
-  }
+        }
 
   const profileDoc = {
     uid,
