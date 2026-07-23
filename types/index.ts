@@ -203,3 +203,10 @@ export interface MeetPreferences {
   interests?: string[]
   relationshipIntent?: RelationshipIntent
 }
+
+  export interface Like {
+  id: string
+  fromUid: string
+  toUid: string
+  createdAt: string
+  }
