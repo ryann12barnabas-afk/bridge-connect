@@ -40,6 +40,8 @@ export interface User {
   profileCompletionPercent: number
   lastActiveAt: string
   onlineStatus: boolean
+  dailyLikesUsed: number
+  dailyLikesResetAt: string
 }
 
 export interface Profile {
