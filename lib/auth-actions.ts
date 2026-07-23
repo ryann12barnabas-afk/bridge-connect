@@ -46,6 +46,9 @@ export async function registerUser(data: RegisterInput) {
     profileCompletionPercent: 0,
     lastActiveAt: now,
     onlineStatus: true,
+    dailyLikesUsed: 0,
+    dailyLikesResetAt: '',
+    }
   }
 
   const profileDoc = {
