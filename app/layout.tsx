@@ -3,6 +3,7 @@ import { Sora, Inter } from 'next/font/google'
 import './globals.css'
 import { AuthProvider } from '@/hooks/useAuth'
 import { Toaster } from 'react-hot-toast'
+import AgeGate from '@/components/ui/AgeGate'
 import Script from 'next/script'
 
 const sora = Sora({
@@ -64,6 +65,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" className={`${sora.variable} ${inter.variable}`} suppressHydrationWarning>
       <body className="font-body bg-white text-brand-ink dark:bg-brand-ink dark:text-white antialiased">
         <AuthProvider>
+          <AgeGate />
           {children}
           <Toaster position="top-center" />
         </AuthProvider>
