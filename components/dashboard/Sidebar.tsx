@@ -11,7 +11,6 @@ import Logo from '@/components/ui/Logo'
 import { useAuth } from '@/hooks/useAuth'
 
 const NAV = [
-  const NAV = [
   { href: '/dashboard', label: 'Overview', icon: HiOutlineHome },
   { href: '/dashboard/meet', label: 'Meet Someone', icon: HiOutlineSparkles },
   { href: '/dashboard/likes', label: 'Who Liked You', icon: HiOutlineHeart },
