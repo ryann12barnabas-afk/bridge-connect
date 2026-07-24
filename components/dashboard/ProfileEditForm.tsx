@@ -4,7 +4,7 @@ import { useState, useRef } from 'react'
 import Image from 'next/image'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { doc, updateDoc } from 'firebase/firestore'
+import { doc, setDoc } from 'firebase/firestore'
 import toast from 'react-hot-toast'
 import { HiOutlineCamera } from 'react-icons/hi2'
 import { db } from '@/firebase/config'
@@ -50,7 +50,7 @@ export default function ProfileEditForm() {
     setUploading(true)
     try {
       const url = await uploadProfilePhoto(user.uid, file)
-      await updateDoc(doc(db, 'profiles', user.uid), { photoURL: url, updatedAt: new Date().toISOString() })
+      await setDoc(doc(db, 'profiles', user.uid), { photoURL: url, updatedAt: new Date().toISOString() }, { merge: true })
       toast.success('Photo updated!')
     } catch (err: any) {
       toast.error(err?.message || 'Upload failed.')
@@ -62,12 +62,12 @@ export default function ProfileEditForm() {
   const onSubmit = async (data: FormData) => {
     if (!user) return
     try {
-      await updateDoc(doc(db, 'profiles', user.uid), {
+      await setDoc(doc(db, 'profiles', user.uid), {
         ...data,
         bio: sanitizeInput(data.bio || ''),
         interests,
         updatedAt: new Date().toISOString(),
-      })
+      }, { merge: true })
 
       const completion = calcProfileCompletion({
         photoURL: profile?.photoURL,
@@ -76,8 +76,7 @@ export default function ProfileEditForm() {
         occupation: data.occupation,
         education: data.education,
       })
-      await updateDoc(doc(db, 'users', user.uid), { profileCompletionPercent: completion })
-
+      await setDoc(doc(db, 'users', user.uid), { profileCompletionPercent: completion }, { merge: true })
       toast.success('Profile updated!')
     } catch {
       toast.error('Could not update profile.')
