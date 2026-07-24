@@ -23,7 +23,6 @@ export default function ProfileEditForm() {
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const {
-  const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
