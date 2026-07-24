@@ -62,6 +62,7 @@ export interface Profile {
   education: string
   isVerified: boolean
   verificationDocURL?: string
+  spotifyTrackUrl?: string
   latitude?: number
   longitude?: number
   updatedAt: string
