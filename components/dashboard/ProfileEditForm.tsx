@@ -23,6 +23,7 @@ export default function ProfileEditForm() {
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const {
+  const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
@@ -35,6 +36,7 @@ export default function ProfileEditForm() {
       town: profile?.town,
       county: profile?.county,
       relationshipStatus: profile?.relationshipStatus,
+      spotifyTrackUrl: profile?.spotifyTrackUrl,
     },
   })
 
@@ -163,6 +165,19 @@ export default function ProfileEditForm() {
             </button>
           ))}
         </div>
+      </div>
+
+      <div>
+        <label className="text-xs font-semibold text-brand-ink/60 dark:text-white/60">Favorite song (Spotify link)</label>
+        <input
+          className="input-field mt-1"
+          placeholder="https://open.spotify.com/track/..."
+          {...register('spotifyTrackUrl')}
+        />
+        {errors.spotifyTrackUrl && <p className="mt-1 text-xs text-red-500">{errors.spotifyTrackUrl.message}</p>}
+        <p className="mt-1 text-xs text-brand-ink/40 dark:text-white/40">
+          Open a song in the Spotify app, tap Share → Copy Link, and paste it here.
+        </p>
       </div>
 
       <button type="submit" disabled={isSubmitting} className="btn-primary w-full !py-3">
