@@ -134,6 +134,48 @@ export async function loginWithGoogle() {
     { merge: true }
   )
 
+  // Google sign-in never collects age/gender/location, so create a starter
+  // profile doc if one doesn't exist yet — without this, profile edits later
+  // fail because there's nothing to update.
+  await setDoc(
+    doc(db, 'profiles', uid),
+    {
+      uid,
+      age: 18,
+      gender: 'other',
+      lookingFor: 'everyone',
+      country: 'Kenya',
+      county: '',
+      town: '',
+      photoURL: cred.user.photoURL || '',
+      photos: [],
+      bio: '',
+      interests: [],
+      relationshipStatus: 'prefer-not-to-say',
+      relationshipIntent: 'dating',
+      occupation: '',
+      education: '',
+      isVerified: false,
+      updatedAt: now,
+    },
+    { merge: true }
+  )
+
+  await setDoc(
+    doc(db, 'subscriptions', uid),
+    {
+      uid,
+      status: 'none',
+      plan: null,
+      startedAt: null,
+      expiryDate: null,
+      paymentReference: null,
+      transactionId: null,
+      autoRenew: false,
+    },
+    { merge: true }
+  )
+
   return cred.user
 }
 
