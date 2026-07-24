@@ -60,8 +60,13 @@ export const profileEditSchema = z.object({
   relationshipStatus: z
     .enum(['single', 'divorced', 'widowed', 'complicated', 'prefer-not-to-say'])
     .optional(),
+  spotifyTrackUrl: z
+    .string()
+    .refine((val) => !val || val.includes('open.spotify.com'), {
+      message: 'Paste a valid Spotify link (open.spotify.com/...)',
+    })
+    .optional(),
 })
-
 export const mpesaPhoneSchema = z.object({
   phoneNumber: z
     .string()
