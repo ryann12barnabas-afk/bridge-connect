@@ -13,10 +13,8 @@ export default function DashboardOverview() {
 
   const STATS = [
     { label: 'Profile completion', value: `${user?.profileCompletionPercent ?? 0}%` },
-    { label: 'Free meets left', value: isPremium ? '∞' : user?.freeMeetsRemaining ?? 0 },
     { label: 'Membership', value: isPremium ? 'Premium' : 'Free' },
   ]
-
   return (
     <div className="space-y-8">
       <motion.div
