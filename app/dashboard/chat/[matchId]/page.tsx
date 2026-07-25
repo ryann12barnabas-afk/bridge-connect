@@ -12,7 +12,7 @@ import { useAuth } from '@/hooks/useAuth'
 import {
   subscribeToMessages, subscribeToMatch, sendMessage, setTypingStatus, subscribeToTyping,
 } from '@/lib/chat'
-import { uploadChatImage } from '@/lib/storage'
+import { uploadChatImage } from '@/lib/cloudinary'
 import { startVideoCall, updateCallStatus, subscribeToCallSession } from '@/lib/video'
 import VideoCallRoom from '@/components/video/VideoCallRoom'
 import type { Message, Match, User } from '@/types'
