@@ -185,13 +185,12 @@ export interface RegisterFormData {
   bio: string
   interests: string[]
   relationshipStatus: RelationshipStatus
-  occupation: string
-  education: string
+  countryCode: string
   phoneNumber: string
   email: string
   password: string
   confirmPassword: string
-}
+  }
 
 export interface LoginFormData {
   email: string
