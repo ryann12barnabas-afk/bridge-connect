@@ -14,16 +14,17 @@ export const registerSchema = z
     gender: z.enum(['male', 'female', 'non-binary', 'other']),
     lookingFor: z.enum(['male', 'female', 'everyone']),
     country: z.string().min(2, 'Country is required'),
-    county: z.string().min(2, 'County is required'),
-    town: z.string().min(1, 'Town is required'),
+    county: z.string().min(2, 'County/region is required'),
+    town: z.string().min(1, 'Town/city is required'),
     bio: z.string().max(500, 'Bio must be under 500 characters').optional().default(''),
     interests: z.array(z.string()).max(15).optional().default([]),
     relationshipStatus: z.enum(['single', 'divorced', 'widowed', 'complicated', 'prefer-not-to-say']),
     occupation: z.string().max(100).optional().default(''),
     education: z.string().max(100).optional().default(''),
+    countryCode: z.string().min(2, 'Select your country code'),
     phoneNumber: z
       .string()
-      .regex(/^(?:\+254|0)7\d{8}$/, 'Enter a valid Kenyan phone number (e.g. 07XXXXXXXX)'),
+      .regex(/^\d{6,12}$/, 'Enter a valid phone number (digits only, no leading 0)'),
     email: z.string().email('Enter a valid email address'),
     password: z
       .string()
