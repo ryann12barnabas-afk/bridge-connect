@@ -11,6 +11,7 @@ import {
 import { useAuth } from '@/hooks/useAuth'
 import { findMeetCandidatesBatch } from '@/lib/meet'
 import { sendLike, recordPass, getLikedUids, getPassedUids, subscribeToLikesReceived } from '@/lib/likes'
+import { getAllBlockedUids } from '@/lib/blocks'
 import { canSendLike, consumeDailyLike } from '@/lib/dailyLimit'
 import { getSpotifyEmbedUrl } from '@/lib/spotify'
 import MatchCelebrationModal from '@/components/dashboard/MatchCelebrationModal'
@@ -33,11 +34,12 @@ export default function MeetPage() {
     if (!user || !profile) return
     setLoading(true)
     try {
-      const [likedUids, passedUids] = await Promise.all([
+      const [likedUids, passedUids, blockedUids] = await Promise.all([
         getLikedUids(user.uid),
         getPassedUids(user.uid),
+        getAllBlockedUids(user.uid),
       ])
-      const exclude = [...likedUids, ...passedUids]
+      const exclude = [...likedUids, ...passedUids, ...blockedUids]
       const prefs = {
         ageMin: Math.max(18, profile.age - 8),
         ageMax: profile.age + 8,
