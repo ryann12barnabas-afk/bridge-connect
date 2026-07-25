@@ -213,3 +213,10 @@ export interface MeetPreferences {
   toUid: string
   createdAt: string
   }
+
+export interface Block {
+  id: string
+  blockerUid: string
+  blockedUid: string
+  createdAt: string
+  }
