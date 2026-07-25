@@ -161,21 +161,6 @@ export async function loginWithGoogle() {
     { merge: true }
   )
 
-  await setDoc(
-    doc(db, 'subscriptions', uid),
-    {
-      uid,
-      status: 'none',
-      plan: null,
-      startedAt: null,
-      expiryDate: null,
-      paymentReference: null,
-      transactionId: null,
-      autoRenew: false,
-    },
-    { merge: true }
-  )
-
   return cred.user
 }
 
