@@ -135,16 +135,16 @@ export default function RegisterForm() {
               </div>
               <div>
                 <label className="text-xs font-semibold text-brand-ink/60 dark:text-white/60">Phone number</label>
-                <div className="mt-1 flex gap-2">
-                  <select className="input-field w-28 shrink-0" {...register('countryCode')}>
+<div className="mt-1 flex gap-2">
+                  <select className="input-field w-20 shrink-0 !px-2 text-sm" {...register('countryCode')}>
                     {COUNTRY_CODES.map((c) => (
                       <option key={`${c.iso2}-${c.dialCode}`} value={c.dialCode}>
-                        {c.dialCode} {c.iso2}
+                        {c.dialCode}
                       </option>
                     ))}
                   </select>
                   <input
-                    className="input-field flex-1"
+                    className="input-field flex-[2]"
                     placeholder="712345678"
                     {...register('phoneNumber')}
                   />
