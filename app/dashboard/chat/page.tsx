@@ -6,6 +6,7 @@ import { doc, getDoc } from 'firebase/firestore'
 import { db } from '@/firebase/config'
 import { useAuth } from '@/hooks/useAuth'
 import { subscribeToUserMatches } from '@/lib/chat'
+import { getAllBlockedUids } from '@/lib/blocks'
 import { timeAgo } from '@/lib/utils'
 import type { Match, User, Profile } from '@/types'
 import { HiOutlineChatBubbleLeftRight } from 'react-icons/hi2'
@@ -21,10 +22,17 @@ export default function ChatListPage() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
+  useEffect(() => {
     if (!user) return
     const unsub = subscribeToUserMatches(user.uid, async (rawMatches) => {
+      const blockedUids = await getAllBlockedUids(user.uid)
+      const visibleMatches = rawMatches.filter((m) => {
+        const otherUid = m.users.find((u) => u !== user.uid)!
+        return !blockedUids.includes(otherUid)
+      })
+
       const enriched = await Promise.all(
-        rawMatches.map(async (m) => {
+        visibleMatches.map(async (m) => {
           const otherUid = m.users.find((u) => u !== user.uid)!
           const [userSnap, profileSnap] = await Promise.all([
             getDoc(doc(db, 'users', otherUid)),
