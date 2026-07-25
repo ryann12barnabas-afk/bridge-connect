@@ -89,6 +89,5 @@ export default function ChatListPage() {
           </Link>
         ))}
       </div>
-    </div>
   )
 }
