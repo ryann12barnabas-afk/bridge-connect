@@ -22,7 +22,6 @@ export default function ChatListPage() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-  useEffect(() => {
     if (!user) return
     const unsub = subscribeToUserMatches(user.uid, async (rawMatches) => {
       const blockedUids = await getAllBlockedUids(user.uid)
@@ -88,6 +87,7 @@ export default function ChatListPage() {
             )}
           </Link>
         ))}
-      </div>
+            </div>
+    </div>
   )
 }
