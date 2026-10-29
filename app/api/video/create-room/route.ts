@@ -72,15 +72,12 @@ export async function POST(request: NextRequest) {
         },
       }),
     })
-    const tokenData = tokenRes.ok ? await tokenRes.json() : null
+    if (!tokenRes.ok) {
+  console.error('Daily token creation failed:', await tokenRes.text())
+  return NextResponse.json({ error: 'Could not create meeting token' }, { status: 502 })
+}
+const { token } = await tokenRes.json()
 
-    return NextResponse.json({
-      roomUrl: room.url,
-      roomName,
-      token: tokenData?.token || null,
-    })
-  } catch (err) {
-    console.error('create-room error:', err)
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+return NextResponse.json({ roomUrl: room.url, roomName, token })
   }
 }
