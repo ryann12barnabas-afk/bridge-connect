@@ -23,31 +23,47 @@ export default function VideoCallRoom({
   const [remaining, setRemaining] = useState(timeLimitSeconds ?? null)
 
   useEffect(() => {
-    if (!containerRef.current) return
+  if (!containerRef.current) return
+  let cancelled = false
+  let frame: DailyCall | null = null
 
-    const callFrame = DailyIframe.createFrame(containerRef.current, {
+  const start = async () => {
+    // Daily allows only one instance at a time: wait for any old one to be gone
+    const existing = DailyIframe.getCallInstance()
+    if (existing) {
+      try { await existing.destroy() } catch {}
+    }
+    if (cancelled || !containerRef.current) return
+
+    frame = DailyIframe.createFrame(containerRef.current, {
       iframeStyle: { width: '100%', height: '100%', border: '0', borderRadius: '1rem' },
       showLeaveButton: false,
       showFullscreenButton: true,
     })
-    callRef.current = callFrame
+    callRef.current = frame
+    frame.on('left-meeting', onLeave)
 
-    callFrame
-      .join({ url: roomUrl, token: token || undefined })
-      .then(() => setJoining(false))
-      .catch((err) => {
-        console.error('Failed to join call:', err)
-        setJoining(false)
+    try {
+      await frame.join({
+        url: roomUrl,
+        ...(typeof token === 'string' && token ? { token } : {}),
       })
-
-    callFrame.on('left-meeting', onLeave)
-
-    return () => {
-      callFrame.destroy()
+      if (!cancelled) setJoining(false)
+    } catch (err) {
+      console.error('Failed to join call:', err)
+      if (!cancelled) setJoining(false)
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [roomUrl, token])
+  }
 
+  start()
+
+  return () => {
+    cancelled = true
+    callRef.current = null
+    frame?.destroy()
+  }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+}, [roomUrl, token])
   useEffect(() => {
     if (remaining === null) return
     if (remaining <= 0) {
